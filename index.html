@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⛳ Cascades Money Game</title>
+<style>
+  /* Google Fonts - loads if online, falls back to system fonts if offline */
+
+  :root {
+    --navy:    #092947;
+    --navy2:   #0d3452;
+    --teal:    #6B99A5;
+    --teal2:   #4a7a8a;
+    --teal3:   #357080;
+    --gold:    #b8860b;
+    --gold2:   #d4a010;
+    --white:   #1a1a1a;
+    --gray:    #edf2f5;
+    --gray2:   #dce6ec;
+    --gray3:   #c0d0da;
+    --red:     #c0392b;
+    --green:   #27714a;
+    --text:    #2c3e50;
+    --text2:   #5a7a8a;
+  }
+
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #eef2f5;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  .header {
+    background: linear-gradient(135deg, #092947 0%, #0d3452 100%);
+    border-bottom: 3px solid var(--teal3);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  }
+  .header-logo { font-size: 36px; line-height: 1; }
+  .header-title {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .header-sub { font-size: 11px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+  .header-badge {
+    margin-left: auto;
+    background: var(--navy);
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /* ── TAB BAR ────────────────────────────────────── */
+  .tabbar {
+    background: #ffffff;
+    border-bottom: 2px solid #d0dce4;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .tab-btn {
+    padding: 8px 4px;
+    border: none;
+    border-right: 1px solid #e8eef2;
+    background: transparent;
+    color: #4a6a7a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.3;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all .2s;
+    min-height: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+  .tab-icon { font-size: 20px; line-height: 1; }
+  .tab-label { font-size: 10px; font-weight: 600; }
+  .tab-btn:hover { color: var(--navy); background: #f5f8fa; }
+  .tab-btn.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+    background: #eef4f8;
+    font-weight: 700;
+  }
+
+  /* ── PANEL ──────────────────────────────────────── */
+  .panel { display: none; padding: 20px; max-width: 1400px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  .panel-title {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .panel-sub { font-size: 12px; color: #5a7a8a; margin-bottom: 20px; }
+
+  /* ── CARDS ──────────────────────────────────────── */
+  .card {
+    background: #ffffff;
+    border: 1px solid #d0dce4;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: 'Courier New', 'Menlo', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d0dce4;
+  }
+
+  /* ── FORMS ──────────────────────────────────────── */
+  select, input[type="number"], input[type="text"] {
+    background: #ffffff;
+    border: 1px solid #c0d0da;
+    color: #2c3e50;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+    width: 100%;
+  }
+  select:focus, input:focus { border-color: var(--navy); }
+  select option { background: #ffffff; }
+
+  label { font-size: 12px; color: #5a7a8a; font-weight: 600; letter-spacing: .5px; margin-bottom: 4px; display: block; }
+
+  /* ── BUTTONS ─────────────────────────────────────── */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .5px;
+  }
+  .btn-primary { background: var(--teal); color: var(--navy); }
+  .btn-primary:hover { background: var(--teal2); transform: translateY(-1px); }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { background: #3d9e5e; transform: translateY(-1px); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #c04444; }
+  .btn-ghost { background: transparent; border: 1px solid #b0c8d4; color: #5a7a8a; }
+  .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-gold { background: var(--gold); color: var(--navy); }
+  .btn-gold:hover { background: var(--gold2); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ── SCORE ENTRY ─────────────────────────────────── */
+  .score-entry-grid {
+    display: grid;
+    grid-template-columns: 200px repeat(18, 1fr) 80px;
+    gap: 4px;
+    align-items: center;
+  }
+  .score-hole-label {
+    background: var(--navy);
+    color: #ffffff;
+    text-align: center;
+    padding: 6px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    letter-spacing: .5px;
+  }
+  .score-input {
+    background: #ffffff;
+    border: 1px solid #c0d0da;
+    color: #1a1a1a;
+    text-align: center;
+    padding: 8px 2px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Courier New', 'Menlo', monospace;
+    outline: none;
+    width: 100%;
+    transition: border-color .15s;
+  }
+  .score-input:focus { border-color: var(--navy); background: #e8f0f5; }
+  .score-total {
+    background: var(--gold);
+    color: var(--navy);
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Courier New', 'Menlo', monospace;
+  }
+
+  /* ── SCORE TABLE ─────────────────────────────────── */
+  .score-table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 900px; }
+  th {
+    background: var(--navy);
+    color: #9ACCD8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid var(--gray);
+  }
+  td {
+    padding: 7px 6px;
+    text-align: center;
+    font-size: 13px;
+    border: 1px solid #d8e4ea;
+    font-family: 'Courier New', 'Menlo', monospace;
+  }
+  tr:nth-child(even) td { background: #f5f9fb; }
+  .td-name { text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 600; color: #1a2a3a; min-width: 140px; }
+  .td-total { background: var(--gold) !important; color: var(--navy); font-weight: 700; }
+  .td-delete { cursor: pointer; color: var(--red); font-size: 16px; padding: 4px 8px; }
+  .td-delete:hover { color: #ff7777; }
+
+  /* ── BETS ────────────────────────────────────────── */
+  .bet-row {
+    display: grid;
+    gap: 10px;
+    align-items: end;
+    background: #f0f5f8;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #c8d8e0;
+    position: relative;
+  }
+  .bet-row-2v2 { grid-template-columns: 24px 1fr 1fr 20px 1fr 1fr 40px; }
+  .bet-row-1v1 { grid-template-columns: 24px 1fr 20px 1fr 40px; }
+  .bet-num {
+    font-family: 'Courier New', 'Menlo', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 700;
+    text-align: center;
+  }
+  .vs-badge {
+    text-align: center;
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  /* ── RESULTS ─────────────────────────────────────── */
+  .result-block {
+    background: #f8fbfc;
+    border: 1px solid #c8d8e0;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .result-block-header {
+    background: var(--navy);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .result-bet-num {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: 18px;
+    color: var(--teal);
+    letter-spacing: 2px;
+  }
+  .result-teams { font-size: 13px; color: #ffffff; font-weight: 600; }
+  .result-net {
+    margin-left: auto;
+    font-family: 'Courier New', 'Menlo', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+  }
+  .net-pos { background: #27714a; color: #ffffff; border: 1px solid #1d5436; }
+  .net-neg { background: #27714a; color: #ffffff; border: 1px solid #1d5436; }
+  .net-loss { background: #b02020; color: #ffffff; border: 1px solid #8a1818; }
+  .net-zero { background: #e0edf5; color: #4a7a8a; }
+  .net-none { background: #e8eef2; color: #6a8a9a; font-size:12px; }
+
+  .hole-grid {
+    display: grid;
+    grid-template-columns: 90px repeat(18, 1fr);
+    gap: 2px;
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .hg-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #4a6a7a;
+    text-align: center;
+    padding: 4px 2px;
+    display: flex;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .hg-hole-num {
+    background: var(--navy);
+    color: #9ACCD8;
+    text-align: center;
+    padding: 5px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 3px;
+    font-family: 'Courier New', 'Menlo', monospace;
+  }
+  .hg-score {
+    text-align: center;
+    padding: 6px 2px;
+    font-size: 13px;
+    font-family: 'Courier New', 'Menlo', monospace;
+    font-weight: 600;
+    border-radius: 3px;
+    color: #1a2a3a;
+  }
+  .hg-score.team-a { background: rgba(154,204,216,.15); }
+  .hg-score.team-b { background: rgba(224,85,85,.12); }
+  .hg-result {
+    text-align: center;
+    padding: 5px 2px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 3px;
+    font-family: 'Courier New', 'Menlo', monospace;
+  }
+  .hg-result.up   { background: #c8ecd8; color: #1a6b3a; }
+  .hg-result.dn   { background: #fdd8d8; color: #9b2020; }
+  .hg-result.even { background: #e0edf5; color: #4a7a8a; }
+  .hg-result.none { background: transparent; color: var(--gray3); }
+  .hg-running {
+    text-align: center;
+    padding: 5px 2px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 3px;
+    font-family: 'Courier New', 'Menlo', monospace;
+    color: #5a7a8a;
+  }
+  .hg-running.pos { color: #1a6b3a; }
+  .hg-running.neg { color: #9b2020; }
+  .hg-score.indiv-a { background: #e8f3f8; color: #2a4a5a; font-size: 11px; }
+  .hg-score.indiv-b { background: #fdeaea; color: #5a2020; font-size: 11px; }
+  .hg-label.indiv { color: #8aacba; font-size: 9px; font-style: italic; }
+  .inline-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin-left: 2px;
+    vertical-align: middle;
+    font-family: 'Courier New', 'Menlo', monospace;
+    letter-spacing: .3px;
+  }
+  .inline-badge.up { background: #c8ecd8; color: #1a6b3a; }
+  .inline-badge.dn { background: #fdd8d8; color: #9b2020; }
+  .inline-badge.ev { background: #e0edf5; color: #4a7a8a; }
+
+  /* ── SETTLEMENT ──────────────────────────────────── */
+  .settle-row {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px 140px 160px;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+  .settle-row:nth-child(even) { background: #f0f5f8; }
+  .settle-name { font-weight: 600; color: #1a2a3a; }
+  .settle-num { text-align: right; font-family: 'Courier New', 'Menlo', monospace; font-size: 13px; }
+  .settle-total { text-align: right; font-family: 'Courier New', 'Menlo', monospace; font-weight: 700; font-size: 15px; }
+  .settle-badge {
+    text-align: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Courier New', 'Menlo', monospace;
+    letter-spacing: .5px;
+  }
+  .settle-hdr { color: #4a7a8a; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .balance-bar {
+    background: var(--navy);
+    border: 2px solid var(--teal2);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  .balance-label { font-family: 'Arial Black', 'Impact', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text2); }
+  .balance-val { font-family: 'Courier New', 'Menlo', monospace; font-size: 20px; font-weight: 700; }
+
+  /* ── PLAYERS ─────────────────────────────────────── */
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
+  .player-chip {
+    background: #edf4f8;
+    border: 1px solid #c0d4de;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a2a3a;
+  }
+  .player-chip-del { cursor: pointer; color: var(--red); font-size: 16px; line-height: 1; opacity: .6; }
+  .player-chip-del:hover { opacity: 1; }
+
+  /* ── UTILITY ─────────────────────────────────────── */
+  .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .flex-end { justify-content: flex-end; }
+  .mt8 { margin-top: 8px; }
+  .mt16 { margin-top: 16px; }
+  .empty { color: var(--text2); font-size: 13px; padding: 20px; text-align: center; color: #7a9aaa; font-style: italic; }
+  .tag-a { display:inline-block; background:rgba(154,204,216,.2); color:var(--teal); border-radius:4px; padding:1px 8px; font-size:11px; font-weight:700; margin-right:4px; }
+  .tag-b { display:inline-block; background:rgba(224,85,85,.2); color:var(--red); border-radius:4px; padding:1px 8px; font-size:11px; font-weight:700; }
+  .tag-p1 { display:inline-block; background:rgba(154,204,216,.2); color:var(--teal); border-radius:4px; padding:1px 8px; font-size:11px; font-weight:700; margin-right:4px; }
+  .tag-p2 { display:inline-block; background:rgba(224,85,85,.2); color:var(--red); border-radius:4px; padding:1px 8px; font-size:11px; font-weight:700; }
+  .pill {
+    display:inline-block; padding:3px 10px; border-radius:12px;
+    font-size:11px; font-weight:700; font-family:'DM Mono',monospace;
+  }
+  .toast {
+    position:fixed; bottom:24px; right:24px;
+    background:var(--green); color:#fff;
+    padding:12px 20px; border-radius:8px;
+    font-weight:700; font-size:14px;
+    box-shadow:0 4px 20px rgba(0,0,0,.4);
+    z-index:999; animation:slideIn .3s ease;
+    display:none;
+  }
+  @keyframes slideIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  @media (max-width: 700px) {
+    .panel { padding: 12px; }
+    .score-entry-grid { grid-template-columns: 100px repeat(9,1fr) 60px; }
+    .settle-row { grid-template-columns: 1fr 80px 100px; }
+    .bet-row-2v2 { grid-template-columns: 1fr 1fr; }
+    .bet-row-1v1 { grid-template-columns: 1fr 1fr; }
+    .card { padding: 12px; }
+    .hole-grid { padding: 6px; gap: 1px; }
+    .hg-score { font-size: 11px; padding: 4px 1px; }
+    .hg-hole-num { font-size: 9px; padding: 3px 1px; }
+    .hg-label { font-size: 9px; }
+    .hg-score.indiv-a { background: #e8f3f8; color: #2a4a5a; font-size: 11px; }
+  .hg-score.indiv-b { background: #fdeaea; color: #5a2020; font-size: 11px; }
+  .hg-label.indiv { color: #8aacba; font-size: 9px; font-style: italic; }
+  .inline-badge { font-size: 7px; padding: 1px 2px; }
+    .result-block-header { padding: 8px 10px; gap: 8px; }
+    .result-bet-num { font-size: 14px; }
+    .result-teams { font-size: 11px; }
+    .result-net { font-size: 12px; padding: 3px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">⛳</div>
+  <div>
+    <div class="header-title" style="color:#9ACCD8;">Cascades Money Game</div>
+    <div class="header-sub">Cascades Country Club Mens Game</div>
+  </div>
+  <div class="header-badge" id="roundBadge">Round Ready</div>
+</div>
+
+<div class="tabbar">
+  <button class="tab-btn active" data-tab="scores" onclick="showTab('scores')"><span class="tab-icon">⛳</span><span class="tab-label">Scores</span></button>
+  <button class="tab-btn" data-tab="bets2v2" onclick="showTab('bets2v2')"><span class="tab-icon">👥</span><span class="tab-label">2v2 Bets</span></button>
+  <button class="tab-btn" data-tab="bets1v1" onclick="showTab('bets1v1')"><span class="tab-icon">🤝</span><span class="tab-label">1v1 Bets</span></button>
+  <button class="tab-btn" data-tab="res2v2" onclick="showTab('res2v2')"><span class="tab-icon">📊</span><span class="tab-label">2v2 Results</span></button>
+  <button class="tab-btn" data-tab="res1v1" onclick="showTab('res1v1')"><span class="tab-icon">📊</span><span class="tab-label">1v1 Results</span></button>
+  <button class="tab-btn" data-tab="settle" onclick="showTab('settle')"><span class="tab-icon">💰</span><span class="tab-label">Settle Up</span></button>
+  <button class="tab-btn" data-tab="players" onclick="showTab('players')"><span class="tab-icon">👤</span><span class="tab-label">Players</span></button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCORE ENTRY
+══════════════════════════════════════════════════════ -->
+<div id="tab-scores" class="panel active">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+    <div class="panel-title" style="margin-bottom:0;">Score Entry</div>
+    <button class="btn btn-danger btn-sm" onclick="clearAllScores()">🗑 New Round — Clear Everything</button>
+  </div>
+  <div class="panel-sub">Select a player, enter hole-by-hole scores, then click UPDATE SCORES.</div>
+
+  <div class="card">
+    <div class="card-title">Enter Scores</div>
+    <!-- Player selector + front/back toggle -->
+    <div class="flex" style="margin-bottom:14px;">
+      <div style="flex:0 0 220px;">
+        <label>Select Player</label>
+        <select id="entryPlayer" onchange="updateEntryTotal()">
+          <option value="">— choose player —</option>
+        </select>
+      </div>
+      <div style="margin-left:auto; display:flex; gap:8px; align-items:flex-end;">
+        <button class="btn btn-success" onclick="submitScore()" style="font-size:15px; padding:10px 28px;">
+          ✔ UPDATE
+        </button>
+      </div>
+    </div>
+
+    <!-- Hole inputs: front 9 -->
+    <div style="margin-bottom:6px;">
+      <div style="font-size:11px; color:#4a7a8a; font-weight:700; letter-spacing:1px; margin-bottom:6px;">FRONT NINE</div>
+      <div class="score-entry-grid" style="grid-template-columns: 80px repeat(9,1fr) 90px;">
+        <div class="score-hole-label">Player</div>
+        <div id="hl1" class="score-hole-label">1</div>
+        <div id="hl2" class="score-hole-label">2</div>
+        <div id="hl3" class="score-hole-label">3</div>
+        <div id="hl4" class="score-hole-label">4</div>
+        <div id="hl5" class="score-hole-label">5</div>
+        <div id="hl6" class="score-hole-label">6</div>
+        <div id="hl7" class="score-hole-label">7</div>
+        <div id="hl8" class="score-hole-label">8</div>
+        <div id="hl9" class="score-hole-label">9</div>
+        <div class="score-hole-label" style="background:var(--navy);">OUT</div>
+        <div style="display:flex;align-items:center;font-size:12px;color:var(--text2);padding:0 4px;">Scores</div>
+        <input class="score-input" id="h1"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h2"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h3"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h4"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h5"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h6"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h7"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h8"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h9"  type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <div class="score-total" id="outTotal" style="font-size:15px;">—</div>
+      </div>
+    </div>
+
+    <!-- Back 9 -->
+    <div>
+      <div style="font-size:11px; color:#4a7a8a; font-weight:700; letter-spacing:1px; margin-bottom:6px;">BACK NINE</div>
+      <div class="score-entry-grid" style="grid-template-columns: 80px repeat(9,1fr) 90px;">
+        <div class="score-hole-label">Player</div>
+        <div class="score-hole-label">10</div>
+        <div class="score-hole-label">11</div>
+        <div class="score-hole-label">12</div>
+        <div class="score-hole-label">13</div>
+        <div class="score-hole-label">14</div>
+        <div class="score-hole-label">15</div>
+        <div class="score-hole-label">16</div>
+        <div class="score-hole-label">17</div>
+        <div class="score-hole-label">18</div>
+        <div class="score-hole-label" style="background:var(--navy);">IN</div>
+        <div style="display:flex;align-items:center;font-size:12px;color:var(--text2);padding:0 4px;">Scores</div>
+        <input class="score-input" id="h10" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h11" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h12" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h13" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h14" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h15" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h16" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h17" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <input class="score-input" id="h18" type="number" min="1" max="20" placeholder="—" oninput="updateEntryTotal()">
+        <div class="score-total" id="inTotal" style="font-size:15px;">—</div>
+      </div>
+    </div>
+
+    <!-- Grand total bar -->
+    <div style="margin-top:12px; background:var(--navy); border-radius:8px; padding:12px 20px;
+                display:flex; align-items:center; justify-content:space-between; border:1px solid var(--teal2);">
+      <span style="font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:16px; color:var(--text2);">TOTAL SCORE</span>
+      <span id="grandTotal" style="font-family:'DM Mono',monospace; font-size:28px; font-weight:700; color:var(--gold);">—</span>
+    </div>
+  </div>
+
+  <!-- Saved scores table -->
+  <div class="card">
+    <div class="card-title">Saved Scores This Round</div>
+    <div class="score-table-wrap">
+      <table id="scoresTable">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
+            <th style="background:#061e33;">OUT</th>
+            <th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th>
+            <th style="background:#061e33;">IN</th>
+            <th style="background:var(--gold);color:var(--navy);">TOT</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="scoresBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     2v2 BETS
+══════════════════════════════════════════════════════ -->
+<div id="tab-bets2v2" class="panel">
+  <div class="panel-title">2v2 Bets</div>
+  <div class="panel-sub">Each bet: Team A (2 players) vs Team B (2 players). Low ball wins each hole. $5/hole, max $20 loss.</div>
+  <div class="card">
+    <div class="card-title">Team Bets</div>
+    <div id="bets2v2Container"></div>
+    <button class="btn btn-primary mt16" onclick="addBet2v2()">+ Add 2v2 Bet</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     1v1 BETS
+══════════════════════════════════════════════════════ -->
+<div id="tab-bets1v1" class="panel">
+  <div class="panel-title">1v1 Bets</div>
+  <div class="panel-sub">Head-to-head. Low score wins each hole. $5/hole, max $20 loss per bet.</div>
+  <div class="card">
+    <div class="card-title">Head-to-Head Bets</div>
+    <div id="bets1v1Container"></div>
+    <button class="btn btn-primary mt16" onclick="addBet1v1()">+ Add 1v1 Bet</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     2v2 RESULTS
+══════════════════════════════════════════════════════ -->
+<div id="tab-res2v2" class="panel">
+  <div class="panel-title">2v2 Results</div>
+  <div class="panel-sub">Team Low Ball — hole-by-hole results. 1UP = Team A won that hole from Team A's perspective.</div>
+  <div id="res2v2Container"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     1v1 RESULTS
+══════════════════════════════════════════════════════ -->
+<div id="tab-res1v1" class="panel">
+  <div class="panel-title">1v1 Results</div>
+  <div class="panel-sub">Head-to-head — hole-by-hole results. 1UP = Player 1 won that hole.</div>
+  <div id="res1v1Container"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SETTLEMENT
+══════════════════════════════════════════════════════ -->
+<div id="tab-settle" class="panel">
+  <div class="panel-title">Settle Up</div>
+  <div class="panel-sub">Total winnings and losses per player. Must net to $0.</div>
+  <div class="card">
+    <div class="settle-row" style="margin-bottom:8px;">
+      <div class="settle-hdr">Player</div>
+      <div class="settle-hdr" style="text-align:right;">2v2</div>
+      <div class="settle-hdr" style="text-align:right;">1v1</div>
+      <div class="settle-hdr" style="text-align:right;">Total Net</div>
+      <div class="settle-hdr" style="text-align:center;">Status</div>
+    </div>
+    <div id="settleBody"></div>
+    <div class="balance-bar" id="balanceBar">
+      <div class="balance-label">Grand Total (must = $0)</div>
+      <div class="balance-val" id="balanceVal">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PLAYERS
+══════════════════════════════════════════════════════ -->
+<div id="tab-players" class="panel">
+  <div class="panel-title">Player Roster</div>
+  <div class="panel-sub">Manage players. Names appear in all dropdowns across the app.</div>
+  <div class="card">
+    <div class="card-title">Add New Player</div>
+    <div class="flex">
+      <div style="flex:1; max-width:300px;">
+        <input type="text" id="newPlayerName" placeholder="Full name" onkeydown="if(event.key==='Enter')addPlayer()">
+      </div>
+      <button class="btn btn-success" onclick="addPlayer()">+ Add Player</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Current Roster (<span id="playerCount">0</span> players)</div>
+    <div class="player-grid" id="playerGrid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE — all persisted to localStorage
+// ════════════════════════════════════════════════════════
+const LS = {
+  get: (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set: (k, v)   => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+let players = LS.get('ng_players', [
+    "Aaron Goode",
+    "Adam Alpha",
+    "Adam Renfroe",
+    "Allen Reese",
+    "Andrew Bloch",
+    "BJ Waters",
+    "Braden Bergman",
+    "Bret Paschall",
+    "Bryan Baker",
+    "Bryan Gatlin",
+    "Carter Elliott",
+    "Chris Johnson",
+    "Chris Tubbs",
+    "Clay Hodge",
+    "Cliff McCoy",
+    "Cody Taff",
+    "Colby Nix",
+    "Colt Griffin",
+    "DD",
+    "David Bridges",
+    "David G'Sell",
+    "David Jones",
+    "David Murphy",
+    "David Paulk",
+    "Davis Foster",
+    "Dayton Cargill",
+    "Dog",
+    "Don Carroll",
+    "Donnie Obannon",
+    "Donny Wilson",
+    "Eddie Baker",
+    "Glenn Gandy",
+    "Jarrod Wallum",
+    "Jay Misenheimer",
+    "Jeff Hunt",
+    "Jim Usrey",
+    "Jimmy Ray Sawyer",
+    "John Carlton",
+    "Kyle Rutherford",
+    "Logan Crouch",
+    "Mark Gatlin",
+    "Matt Malley",
+    "Mike Watson",
+    "Nourse",
+    "Patrick Dark",
+    "Peter Sirianni",
+    "Richie Moss",
+    "Roger Fowler",
+    "Ryan Lapuz",
+    "Sam Johnson",
+    "Scott Warner",
+    "Stephen Bryant",
+    "Tayler Dunlap",
+    "Todd Crouch",
+    "Tyler Dunlap",
+    "Tyler Miller",
+    "Victor Davis",
+    "Victor Martinez",
+    "Zach Glaske"
+  ]);
+let scores   = LS.get('ng_scores', {});    // { name: [18 scores or ""] }
+let bets2v2  = LS.get('ng_bets2v2', []);   // [{a1,a2,b1,b2}]
+let bets1v1  = LS.get('ng_bets1v1', []);   // [{p1,p2}]
+
+function save() {
+  LS.set('ng_players', players);
+  LS.set('ng_scores',  scores);
+  LS.set('ng_bets2v2', bets2v2);
+  LS.set('ng_bets1v1', bets1v1);
+}
+
+// ════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  // Find the matching tab button by its data-tab attribute instead of relying on event global
+  const btn = document.querySelector('.tab-btn[data-tab="' + id + '"]');
+  if (btn) btn.classList.add('active');
+  if (id === 'scores')   renderScoresTable();
+  if (id === 'bets2v2')  renderBets2v2();
+  if (id === 'bets1v1')  renderBets1v1();
+  if (id === 'res2v2')   renderRes2v2();
+  if (id === 'res1v1')   renderRes1v1();
+  if (id === 'settle')   renderSettle();
+  if (id === 'players')  renderPlayers();
+}
+
+// ════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════
+function toast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color || 'var(--green)';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ════════════════════════════════════════════════════════
+// PLAYER SELECTS — refresh all dropdowns
+// ════════════════════════════════════════════════════════
+function refreshAllSelects() {
+  // Score entry dropdown
+  const ep = document.getElementById('entryPlayer');
+  const cur = ep.value;
+  ep.innerHTML = '<option value="">— choose player —</option>';
+  players.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    if (p === cur) o.selected = true;
+    ep.appendChild(o);
+  });
+  // Bet selects
+  document.querySelectorAll('.bet-player-select').forEach(sel => {
+    const v = sel.value;
+    sel.innerHTML = '<option value="">— player —</option>';
+    players.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p; o.textContent = p;
+      if (p === v) o.selected = true;
+      sel.appendChild(o);
+    });
+  });
+}
+
+function makeSelect(cls, val, onchange) {
+  let html = `<select class="bet-player-select ${cls}" onchange="${onchange}">`;
+  html += '<option value="">— player —</option>';
+  players.forEach(p => {
+    html += `<option value="${esc(p)}" ${p === val ? 'selected' : ''}>${esc(p)}</option>`;
+  });
+  html += '</select>';
+  return html;
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ════════════════════════════════════════════════════════
+// SCORE ENTRY
+// ════════════════════════════════════════════════════════
+function getEntryScores() {
+  const arr = [];
+  for (let h = 1; h <= 18; h++) {
+    const v = document.getElementById('h'+h).value;
+    arr.push(v === '' ? '' : Number(v));
+  }
+  return arr;
+}
+
+function updateEntryTotal() {
+  const arr = getEntryScores();
+  const front = arr.slice(0,9).filter(v => v !== '');
+  const back  = arr.slice(9,18).filter(v => v !== '');
+  const all   = arr.filter(v => v !== '');
+
+  const outEl = document.getElementById('outTotal');
+  const inEl  = document.getElementById('inTotal');
+  const gtEl  = document.getElementById('grandTotal');
+
+  outEl.textContent = front.length ? front.reduce((a,b)=>a+b,0) : '—';
+  inEl.textContent  = back.length  ? back.reduce((a,b)=>a+b,0)  : '—';
+  gtEl.textContent  = all.length   ? all.reduce((a,b)=>a+b,0)   : '—';
+}
+
+function submitScore() {
+  const player = document.getElementById('entryPlayer').value;
+  if (!player) { toast('Please select a player first.', 'var(--red)'); return; }
+  const arr = getEntryScores();
+  if (arr.every(v => v === '')) { toast('Please enter at least one hole score.', 'var(--red)'); return; }
+  scores[player] = arr;
+  save();
+  clearEntryRow();
+  renderScoresTable();
+  toast(`✔ ${player}'s scores saved!`);
+  // update badge
+  const count = Object.keys(scores).length;
+  document.getElementById('roundBadge').textContent = `${count} Player${count!==1?'s':''} Entered`;
+}
+
+function clearEntryRow() {
+  document.getElementById('entryPlayer').value = '';
+  for (let h = 1; h <= 18; h++) document.getElementById('h'+h).value = '';
+  updateEntryTotal();
+}
+
+function deleteScore(name) {
+  if (!confirm(`Remove ${name}'s scores?`)) return;
+  delete scores[name];
+  save();
+  renderScoresTable();
+  const count = Object.keys(scores).length;
+  document.getElementById('roundBadge').textContent = count ? `${count} Player${count!==1?'s':''} Entered` : 'Round Ready';
+}
+
+function clearAllScores() {
+  if (!confirm('Start a new round? This will clear ALL scores, 2v2 bets, 1v1 bets, and reset everything. Cannot be undone.')) return;
+  scores  = {};
+  bets2v2 = [];
+  bets1v1 = [];
+  save();
+  // Reset UI
+  clearEntryRow();
+  renderScoresTable();
+  renderBets2v2();
+  renderBets1v1();
+  renderRes2v2();
+  renderRes1v1();
+  renderSettle();
+  document.getElementById('roundBadge').textContent = 'Round Ready';
+  toast('✔ Everything cleared — ready for a new round!', '#357080');
+}
+
+function renderScoresTable() {
+  const body = document.getElementById('scoresBody');
+  const names = Object.keys(scores);
+  if (!names.length) {
+    body.innerHTML = `<tr><td colspan="23" class="empty">No scores entered yet. Use the form above.</td></tr>`;
+    return;
+  }
+  body.innerHTML = names.map(name => {
+    const sc = scores[name] || [];
+    const front = sc.slice(0,9).filter(v=>v!=='');
+    const back  = sc.slice(9,18).filter(v=>v!=='');
+    const all   = sc.filter(v=>v!=='');
+    const outSum = front.length ? front.reduce((a,b)=>a+b,0) : '';
+    const inSum  = back.length  ? back.reduce((a,b)=>a+b,0)  : '';
+    const tot    = all.length   ? all.reduce((a,b)=>a+b,0)   : '';
+
+    const holeCells = sc.map(v => `<td>${v===''?'—':v}</td>`).join('');
+    const f9 = sc.slice(0,9).map(v=>`<td>${v===''?'—':v}</td>`).join('');
+    const b9 = sc.slice(9,18).map(v=>`<td>${v===''?'—':v}</td>`).join('');
+
+    return `<tr>
+      <td class="td-name">${esc(name)}</td>
+      ${f9}
+      <td style="background:#061e33; font-weight:700; color:var(--teal);">${outSum||'—'}</td>
+      ${b9}
+      <td style="background:#061e33; font-weight:700; color:var(--teal);">${inSum||'—'}</td>
+      <td class="td-total">${tot||'—'}</td>
+      <td class="td-delete" onclick="deleteScore('${esc(name)}')" title="Remove">✕</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// 2v2 BETS
+// ════════════════════════════════════════════════════════
+function addBet2v2() {
+  bets2v2.push({a1:'', a2:'', b1:'', b2:''});
+  save();
+  renderBets2v2();
+}
+
+function removeBet2v2(i) {
+  bets2v2.splice(i, 1);
+  save();
+  renderBets2v2();
+}
+
+function updateBet2v2(i, field, val) {
+  bets2v2[i][field] = val;
+  save();
+}
+
+function renderBets2v2() {
+  const c = document.getElementById('bets2v2Container');
+  if (!bets2v2.length) { c.innerHTML = `<div class="empty">No bets yet. Click "+ Add 2v2 Bet" to start.</div>`; return; }
+  c.innerHTML = bets2v2.map((b, i) => `
+    <div class="bet-row bet-row-2v2">
+      <div class="bet-num">${i+1}</div>
+      <div>
+        <label><span class="tag-a">A</span> Player 1</label>
+        <select class="bet-player-select" onchange="updateBet2v2(${i},'a1',this.value)">
+          <option value="">— player —</option>
+          ${players.map(p=>`<option value="${esc(p)}" ${p===b.a1?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label><span class="tag-a">A</span> Player 2</label>
+        <select class="bet-player-select" onchange="updateBet2v2(${i},'a2',this.value)">
+          <option value="">— player —</option>
+          ${players.map(p=>`<option value="${esc(p)}" ${p===b.a2?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div>
+        <label><span class="tag-b">B</span> Player 1</label>
+        <select class="bet-player-select" onchange="updateBet2v2(${i},'b1',this.value)">
+          <option value="">— player —</option>
+          ${players.map(p=>`<option value="${esc(p)}" ${p===b.b1?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label><span class="tag-b">B</span> Player 2</label>
+        <select class="bet-player-select" onchange="updateBet2v2(${i},'b2',this.value)">
+          <option value="">— player —</option>
+          ${players.map(p=>`<option value="${esc(p)}" ${p===b.b2?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeBet2v2(${i})" style="align-self:flex-end;">✕</button>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// 1v1 BETS
+// ════════════════════════════════════════════════════════
+function addBet1v1() {
+  bets1v1.push({p1:'', p2:''});
+  save();
+  renderBets1v1();
+}
+
+function removeBet1v1(i) {
+  bets1v1.splice(i, 1);
+  save();
+  renderBets1v1();
+}
+
+function updateBet1v1(i, field, val) {
+  bets1v1[i][field] = val;
+  save();
+}
+
+function renderBets1v1() {
+  const c = document.getElementById('bets1v1Container');
+  if (!bets1v1.length) { c.innerHTML = `<div class="empty">No bets yet. Click "+ Add 1v1 Bet" to start.</div>`; return; }
+  c.innerHTML = bets1v1.map((b, i) => `
+    <div class="bet-row bet-row-1v1">
+      <div class="bet-num">${i+1}</div>
+      <div>
+        <label><span class="tag-p1">P1</span> Player</label>
+        <select class="bet-player-select" onchange="updateBet1v1(${i},'p1',this.value)">
+          <option value="">— player —</option>
+          ${players.map(p=>`<option value="${esc(p)}" ${p===b.p1?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div>
+        <label><span class="tag-p2">P2</span> Player</label>
+        <select class="bet-player-select" onchange="updateBet1v1(${i},'p2',this.value)">
+          <option value="">— player —</option>
+          ${players.map(p=>`<option value="${esc(p)}" ${p===b.p2?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeBet1v1(${i})" style="align-self:flex-end;">✕</button>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// CALC HELPERS
+// ════════════════════════════════════════════════════════
+function getScore(name, hole) {
+  if (!name || !scores[name]) return null;
+  const v = scores[name][hole - 1];
+  return (v === '' || v == null) ? null : Number(v);
+}
+
+function lowBall(n1, n2) {
+  const a = getScore(n1, 99); // sentinel - won't be used directly
+  // used inline below
+}
+
+function calc2v2Holes(bet) {
+  // returns array of 18: +1 A wins, -1 B wins, 0 tie, null no data
+  return Array.from({length:18}, (_,i) => {
+    const h = i+1;
+    const a1 = getScore(bet.a1, h), a2 = getScore(bet.a2, h);
+    const b1 = getScore(bet.b1, h), b2 = getScore(bet.b2, h);
+    const aLow = (a1!==null && a2!==null) ? Math.min(a1,a2) : (a1!==null?a1:a2);
+    const bLow = (b1!==null && b2!==null) ? Math.min(b1,b2) : (b1!==null?b1:b2);
+    if (aLow===null || bLow===null) return null;
+    return aLow < bLow ? 1 : bLow < aLow ? -1 : 0;
+  });
+}
+
+function calc1v1Holes(bet) {
+  return Array.from({length:18}, (_,i) => {
+    const h = i+1;
+    const s1 = getScore(bet.p1, h), s2 = getScore(bet.p2, h);
+    if (s1===null || s2===null) return null;
+    return s1 < s2 ? 1 : s2 < s1 ? -1 : 0;
+  });
+}
+
+function netDollars(holes) {
+  // holes = array of +1 (A wins hole), -1 (B wins hole), 0 (halved), null (no score)
+  // Net holes up = aWins - bWins. Each net hole = $5. Max loss = $20 (4 holes).
+  // e.g. A wins 5, B wins 3 → net = 2UP → A wins $10
+  //      A wins 1, B wins 5 → net = 4DN → B wins $20 (capped)
+  const played = holes.filter(h => h !== null);
+  if (!played.length) return null;
+  const aWins = played.filter(h => h === 1).length;
+  const bWins = played.filter(h => h === -1).length;
+  const netHoles = aWins - bWins;           // positive = A up, negative = B up
+  const netDollars = netHoles * 5;          // $5 per net hole
+  return Math.max(-20, Math.min(20, netDollars)); // cap at ±$20
+}
+
+// ════════════════════════════════════════════════════════
+// RESULTS — shared hole grid renderer
+// ════════════════════════════════════════════════════════
+function holeGridHTML(holeResults, scoreRowA, scoreRowB, labelA, labelB, a1Scores, a2Scores, b1Scores, b2Scores, bet) {
+  const holes = Array.from({length:18}, (_,i)=>i+1);
+  const is2v2 = !!a1Scores;
+
+  // Cumulative match standing from A perspective
+  let standing = 0;
+  const standingArr = holeResults.map(r => {
+    if (r === null) return null;
+    standing += r;
+    return standing;
+  });
+
+  function badgeA(i) {
+    if (standingArr[i] === null) return '';
+    const s = standingArr[i];
+    if (s > 0)  return `<span class="inline-badge up">${s}UP</span>`;
+    if (s < 0)  return `<span class="inline-badge dn">${Math.abs(s)}DN</span>`;
+    return `<span class="inline-badge ev">AS</span>`;
+  }
+  function badgeB(i) {
+    if (standingArr[i] === null) return '';
+    const s = standingArr[i];
+    if (s < 0)  return `<span class="inline-badge up">${Math.abs(s)}UP</span>`;
+    if (s > 0)  return `<span class="inline-badge dn">${s}DN</span>`;
+    return `<span class="inline-badge ev">AS</span>`;
+  }
+
+  const holeNums = `
+    <div class="hg-label"></div>
+    ${holes.map(h=>`<div class="hg-hole-num">${h}</div>`).join('')}
+  `;
+
+  // Individual player rows (2v2 only)
+  const rowA1 = is2v2 && bet.a1 ? `
+    <div class="hg-label indiv">${esc(bet.a1)}</div>
+    ${a1Scores.map(v=>`<div class="hg-score indiv-a">${v!==null?v:'—'}</div>`).join('')}
+  ` : '';
+  const rowA2 = is2v2 && bet.a2 ? `
+    <div class="hg-label indiv">${esc(bet.a2)}</div>
+    ${a2Scores.map(v=>`<div class="hg-score indiv-a">${v!==null?v:'—'}</div>`).join('')}
+  ` : '';
+  const rowB1 = is2v2 && bet.b1 ? `
+    <div class="hg-label indiv">${esc(bet.b1)}</div>
+    ${b1Scores.map(v=>`<div class="hg-score indiv-b">${v!==null?v:'—'}</div>`).join('')}
+  ` : '';
+  const rowB2 = is2v2 && bet.b2 ? `
+    <div class="hg-label indiv">${esc(bet.b2)}</div>
+    ${b2Scores.map(v=>`<div class="hg-score indiv-b">${v!==null?v:'—'}</div>`).join('')}
+  ` : '';
+
+  // Low ball rows with standing badges
+  const rowA = `
+    <div class="hg-label" style="font-weight:700;color:#2a6a8a;">${labelA}</div>
+    ${scoreRowA.map((v,i) => {
+      const score = v !== null ? v : '—';
+      return `<div class="hg-score team-a">${score}${badgeA(i)}</div>`;
+    }).join('')}
+  `;
+  const rowB = `
+    <div class="hg-label" style="font-weight:700;color:#8a2a2a;">${labelB}</div>
+    ${scoreRowB.map((v,i) => {
+      const score = v !== null ? v : '—';
+      return `<div class="hg-score team-b">${score}${badgeB(i)}</div>`;
+    }).join('')}
+  `;
+
+  return `
+    <div class="hole-grid">
+      ${holeNums}
+      ${rowA1}${rowA2}
+      ${rowA}
+      ${rowB}
+      ${rowB1}${rowB2}
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════
+// 2v2 RESULTS
+// ════════════════════════════════════════════════════════
+function renderRes2v2() {
+  const c = document.getElementById('res2v2Container');
+  const active = bets2v2.filter(b => b.a1||b.a2||b.b1||b.b2);
+  if (!active.length) {
+    c.innerHTML = `<div class="card"><div class="empty">No 2v2 bets entered yet. Go to the 2v2 Bets tab to add them.</div></div>`;
+    return;
+  }
+
+  c.innerHTML = bets2v2.map((bet, i) => {
+    if (!bet.a1 && !bet.a2 && !bet.b1 && !bet.b2) return '';
+    const holes = calc2v2Holes(bet);
+    const net   = netDollars(holes);
+
+    const aScores = Array.from({length:18}, (_,j) => {
+      const a1 = getScore(bet.a1, j+1), a2 = getScore(bet.a2, j+1);
+      return (a1!==null && a2!==null) ? Math.min(a1,a2) : (a1!==null?a1:a2!==null?a2:null);
+    });
+    const bScores = Array.from({length:18}, (_,j) => {
+      const b1 = getScore(bet.b1, j+1), b2 = getScore(bet.b2, j+1);
+      return (b1!==null && b2!==null) ? Math.min(b1,b2) : (b1!==null?b1:b2!==null?b2:null);
+    });
+
+    let netClass = 'net-none', netLabel = 'No scores yet', lossLabel = '';
+    if (net !== null) {
+      if (net > 0) {
+        netClass='net-pos';
+        netLabel=`${esc(bet.a1||'')}${bet.a2?' & '+esc(bet.a2):''} +$${net}`;
+        lossLabel=`${esc(bet.b1||'')}${bet.b2?' & '+esc(bet.b2):''} -$${net}`;
+      } else if (net < 0) {
+        netClass='net-neg';
+        netLabel=`${esc(bet.b1||'')}${bet.b2?' & '+esc(bet.b2):''} +$${Math.abs(net)}`;
+        lossLabel=`${esc(bet.a1||'')}${bet.a2?' & '+esc(bet.a2):''} -$${Math.abs(net)}`;
+      } else { netClass='net-zero'; netLabel='TIE  $0'; }
+    }
+
+    const teamA = [bet.a1, bet.a2].filter(Boolean).join(' & ') || '—';
+    const teamB = [bet.b1, bet.b2].filter(Boolean).join(' & ') || '—';
+
+    const labelA = `${esc(bet.a1||'')}${bet.a1&&bet.a2?' / ':''}${esc(bet.a2||'')}`;
+    const labelB = `${esc(bet.b1||'')}${bet.b1&&bet.b2?' / ':''}${esc(bet.b2||'')}`;
+
+    // Individual scores for each player
+    const a1Scores = Array.from({length:18}, (_,j) => getScore(bet.a1, j+1));
+    const a2Scores = Array.from({length:18}, (_,j) => getScore(bet.a2, j+1));
+    const b1Scores = Array.from({length:18}, (_,j) => getScore(bet.b1, j+1));
+    const b2Scores = Array.from({length:18}, (_,j) => getScore(bet.b2, j+1));
+
+    return `
+      <div class="result-block">
+        <div class="result-block-header">
+          <div class="result-bet-num">BET ${i+1}</div>
+          <div class="result-teams">
+            ${esc(teamA)}
+            <span style="color:#9ACCD8; margin:0 8px;">vs</span>
+            ${esc(teamB)}
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;">
+            <div class="result-net ${netClass}">${netLabel}</div>
+            ${lossLabel ? `<div class="result-net net-loss">${lossLabel}</div>` : ''}
+          </div>
+        </div>
+        ${holeGridHTML(holes, aScores, bScores, labelA, labelB, a1Scores, a2Scores, b1Scores, b2Scores, bet)}
+      </div>
+    `;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// 1v1 RESULTS
+// ════════════════════════════════════════════════════════
+function renderRes1v1() {
+  const c = document.getElementById('res1v1Container');
+  const active = bets1v1.filter(b => b.p1||b.p2);
+  if (!active.length) {
+    c.innerHTML = `<div class="card"><div class="empty">No 1v1 bets entered yet. Go to the 1v1 Bets tab to add them.</div></div>`;
+    return;
+  }
+
+  c.innerHTML = bets1v1.map((bet, i) => {
+    if (!bet.p1 && !bet.p2) return '';
+    const holes = calc1v1Holes(bet);
+    const net   = netDollars(holes);
+
+    const p1Scores = Array.from({length:18}, (_,j) => getScore(bet.p1, j+1));
+    const p2Scores = Array.from({length:18}, (_,j) => getScore(bet.p2, j+1));
+
+    let netClass = 'net-none', netLabel = 'No scores yet', lossLabel = '';
+    if (net !== null) {
+      if (net > 0) {
+        netClass='net-pos'; netLabel=`${esc(bet.p1)}  +$${net}`;
+        lossLabel=`${esc(bet.p2)}  -$${net}`;
+      } else if (net < 0) {
+        netClass='net-pos'; netLabel=`${esc(bet.p2)}  +$${Math.abs(net)}`;
+        lossLabel=`${esc(bet.p1)}  -$${Math.abs(net)}`;
+      } else { netClass='net-zero'; netLabel='TIE  $0'; }
+    }
+
+    const labelP1 = `${esc(bet.p1||'?')}`;
+    const labelP2 = `${esc(bet.p2||'?')}`;
+
+    return `
+      <div class="result-block">
+        <div class="result-block-header">
+          <div class="result-bet-num">BET ${i+1}</div>
+          <div class="result-teams">
+            ${esc(bet.p1||'?')}
+            <span style="color:var(--text2); margin:0 8px;">vs</span>
+            ${esc(bet.p2||'?')}
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;">
+            <div class="result-net ${netClass}">${netLabel}</div>
+            ${lossLabel ? `<div class="result-net net-loss">${lossLabel}</div>` : ''}
+          </div>
+        </div>
+        ${holeGridHTML(holes, p1Scores, p2Scores, labelP1, labelP2)}
+      </div>
+    `;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// SETTLEMENT
+// ════════════════════════════════════════════════════════
+function renderSettle() {
+  // Build net per player across all bets
+  const totals = {}; // name -> {v2, v1, total}
+  const allNames = new Set([
+    ...Object.keys(scores),
+    ...bets2v2.flatMap(b=>[b.a1,b.a2,b.b1,b.b2]),
+    ...bets1v1.flatMap(b=>[b.p1,b.p2]),
+  ].filter(Boolean));
+
+  allNames.forEach(name => { totals[name] = {v2:0, v1:0}; });
+
+  // 2v2 bets
+  bets2v2.forEach(bet => {
+    const holes = calc2v2Holes(bet);
+    const net   = netDollars(holes);
+    if (net === null) return;
+    // net > 0 = Team A won net dollars from Team B
+    // each Team A player gets net/2, each Team B player pays net/2
+    // Each player on winning team wins full net; each player on losing team pays full net
+    [bet.a1, bet.a2].filter(Boolean).forEach(n => { if(totals[n]) totals[n].v2 += net; });
+    [bet.b1, bet.b2].filter(Boolean).forEach(n => { if(totals[n]) totals[n].v2 -= net; });
+  });
+
+  // 1v1 bets
+  bets1v1.forEach(bet => {
+    const holes = calc1v1Holes(bet);
+    const net   = netDollars(holes);
+    if (net === null) return;
+    if (bet.p1 && totals[bet.p1]) totals[bet.p1].v1 += net;
+    if (bet.p2 && totals[bet.p2]) totals[bet.p2].v1 -= net;
+  });
+
+  const names = [...allNames].sort();
+  const body  = document.getElementById('settleBody');
+
+  if (!names.length) {
+    body.innerHTML = `<div class="empty">No players or bets yet.</div>`;
+    document.getElementById('balanceVal').textContent = '—';
+    return;
+  }
+
+  let grandTotal = 0;
+  body.innerHTML = names.map(name => {
+    const d = totals[name] || {v2:0, v1:0};
+    const total = d.v2 + d.v1;
+    grandTotal += total;
+
+    const fmtNum = n => n === 0 ? '—' : (n > 0 ? `+$${n.toFixed(2)}` : `-$${Math.abs(n).toFixed(2)}`);
+    const totalColor = total > 0 ? 'var(--green)' : total < 0 ? 'var(--red)' : 'var(--text2)';
+
+    let badge, badgeStyle;
+    if (total > 0.005) {
+      badge = `Receives $${total.toFixed(2)}`;
+      badgeStyle = 'background:rgba(76,175,110,.2);color:var(--green);border:1px solid var(--green)';
+    } else if (total < -0.005) {
+      badge = `Owes $${Math.abs(total).toFixed(2)}`;
+      badgeStyle = 'background:rgba(224,85,85,.2);color:var(--red);border:1px solid var(--red)';
+    } else {
+      badge = 'Even';
+      badgeStyle = 'background:var(--gray2);color:var(--text2)';
+    }
+
+    return `
+      <div class="settle-row">
+        <div class="settle-name">${esc(name)}</div>
+        <div class="settle-num" style="color:${d.v2>=0?'var(--green)':'var(--red)'}">${fmtNum(d.v2)}</div>
+        <div class="settle-num" style="color:${d.v1>=0?'var(--green)':'var(--red)'}">${fmtNum(d.v1)}</div>
+        <div class="settle-total" style="color:${totalColor}">${fmtNum(total)}</div>
+        <div><span class="settle-badge" style="${badgeStyle}">${badge}</span></div>
+      </div>
+    `;
+  }).join('');
+
+  const bv = document.getElementById('balanceVal');
+  const gt = Math.abs(grandTotal) < 0.01;
+  bv.textContent = gt ? '✅  $0.00 — Balanced' : `⚠️  $${grandTotal.toFixed(2)} — Check bets`;
+  bv.style.color = gt ? 'var(--green)' : 'var(--red)';
+}
+
+// ════════════════════════════════════════════════════════
+// PLAYERS
+// ════════════════════════════════════════════════════════
+function addPlayer() {
+  const inp = document.getElementById('newPlayerName');
+  const name = inp.value.trim();
+  if (!name) { toast('Enter a player name.', 'var(--red)'); return; }
+  if (players.includes(name)) { toast('Player already exists.', 'var(--red)'); return; }
+  players.push(name);
+  save();
+  inp.value = '';
+  renderPlayers();
+  refreshAllSelects();
+  toast(`✔ ${name} added to roster!`);
+}
+
+function removePlayer(name) {
+  if (!confirm(`Remove ${name} from roster? This won't delete their scores.`)) return;
+  players = players.filter(p => p !== name);
+  save();
+  renderPlayers();
+  refreshAllSelects();
+}
+
+function renderPlayers() {
+  document.getElementById('playerCount').textContent = players.length;
+  const grid = document.getElementById('playerGrid');
+  grid.innerHTML = players.map(p => `
+    <div class="player-chip">
+      <span>${esc(p)}</span>
+      <span class="player-chip-del" onclick="removePlayer('${esc(p)}')" title="Remove">✕</span>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+(function init() {
+  refreshAllSelects();
+  renderScoresTable();
+  renderPlayers();
+
+  const count = Object.keys(scores).length;
+  if (count) document.getElementById('roundBadge').textContent = `${count} Player${count!==1?'s':''} Entered`;
+})();
+</script>
+</body>
+</html>
